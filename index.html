@@ -628,7 +628,7 @@
             <img src="assets/cloud.png" alt="Cloud" class="home-cloud" style="left: 65%;">
             <img src="assets/game-title.webp" alt="Game Title">
             <img id="music-toggle" src="assets/music_on.png" alt="Music Toggle" style="position: absolute; top: 30px; right: 30px; width: 64px; height: 64px; cursor: pointer; z-index: 1100;">
-            <p class="game-description">Catch the Gametize Trophy to score points, but watch out for the bombs! How many can you catch in 30 seconds?</p>
+            <p class="game-description">Catch the Transaction to score points, but watch out for the Hazard Alerts! How many can you catch in 30 seconds?</p>
             <button id="start-button">PLAY</button>
         </div>
         <div id="difficulty-alert">Speed Increased!</div>
@@ -695,6 +695,8 @@
         let currentStreak = 0;
         let hasSpawnedPowerup = false;
         const POWERUP_TIME_BONUS = 5; // 5 seconds bonus
+        /** Distance from bottom of #game-container to catch band (must match collision checks). */
+        const BASKET_FROM_BOTTOM = 220;
         let musicPlaying = false;
         let confettiActive = false;
 
@@ -967,7 +969,7 @@
                     // Award bonus points
                     score += 2; // Additional 2 points (1 + 2 = 3 total)
                     document.getElementById('score-text').textContent = score;
-                    createBonusAnimation(playerX + 60, gameContainer.clientHeight - 100);
+                    createBonusAnimation(playerX + 60, gameContainer.clientHeight - BASKET_FROM_BOTTOM + 50);
                     // Reset streak after bonus
                     currentStreak = 0;
                 }
@@ -1050,8 +1052,8 @@
                 badge.style.top = `${badgeY}px`;
 
                 // Check for collision with player at basket level
-                const basketY = gameContainer.clientHeight - 150;
-                if (!hasCollided && badgeY + 30 >= basketY && badgeY + 30 <= basketY + 40) {
+                const basketY = gameContainer.clientHeight - BASKET_FROM_BOTTOM;
+                if (!hasCollided && badgeY + 30 >= basketY && badgeY + 30 <= basketY + 80) {
                     // Use bounding box for accurate collision
                     const badgeX = parseInt(badge.style.left);
                     const badgeCenterX = badgeX + 30;
@@ -1069,10 +1071,10 @@
                         // Update streak
                         updateStreak(badgeType === 'trophy');
                         // Create score animation at the point of collision
-                        createScoreAnimation(badgeCenterX, gameContainer.clientHeight - 120, badgeType === 'trophy');
+                        createScoreAnimation(badgeCenterX, basketY + 30, badgeType === 'trophy');
                         // Create explosion effect if it's a bomb
                         if (badgeType === 'bomb') {
-                            createExplosionEffect(badgeCenterX, gameContainer.clientHeight - 150);
+                            createExplosionEffect(badgeCenterX, basketY);
                         }
                         // Remove badge immediately when caught
                         badge.remove();
@@ -1148,7 +1150,7 @@
                 powerup.style.top = `${powerupY}px`;
 
                 // Check for collision with player
-                const basketY = gameContainer.clientHeight - 150;
+                const basketY = gameContainer.clientHeight - BASKET_FROM_BOTTOM;
                 if (!hasCollided && powerupY + 30 >= basketY && powerupY + 30 <= basketY + 40) {
                     const powerupX = parseInt(powerup.style.left);
                     const powerupCenterX = powerupX + 30;
@@ -1163,7 +1165,7 @@
                         timeLeft += POWERUP_TIME_BONUS;
                         timerDisplay.textContent = `Time: ${timeLeft}`;
                         // Create time bonus animation
-                        createTimeBonusAnimation(powerupCenterX, gameContainer.clientHeight - 120);
+                        createTimeBonusAnimation(powerupCenterX, basketY + 30);
                         powerup.remove();
                         clearInterval(fallInterval);
                         return;
